@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if info %}{{ info.name }}{% else %}Portfolio{% endif %}</title>
+  {% load static portfolio_extras %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..700,0..100&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, ::before, ::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0B0D0F;
+      --surface: #15181C;
+      --surface-hover: #1B1F25;
+      --text: #E4E9EF;
+      --text-muted: #7D8794;
+      --accent: #60A5FA;
+      --accent-glow: rgba(96, 165, 250, 0.08);
+      --accent-subtle: rgba(96, 165, 250, 0.04);
+      --line: #1F242A;
+      --max-width: 960px;
+      --gutter: 1.5rem;
+    }
+
+    html {
+      background: var(--bg);
+      color: var(--text);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--gutter); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes barGlow {
+      0%, 100% { opacity: 0.6; }
+      50%      { opacity: 1; }
+    }
+
+    /* ── Nav ── */
+
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(11, 13, 15, 0.72);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav .container {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 0.875rem; padding-bottom: 0.875rem;
+    }
+
+    .nav-brand {
+      font-weight: 500; font-size: 0.85rem;
+      color: var(--text); text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-links { display: flex; gap: 1.75rem; list-style: none; }
+
+    .nav-links a {
+      text-decoration: none; font-weight: 400; font-size: 0.8rem;
+      color: var(--text-muted); transition: color 0.25s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── Hero ── */
+
+    .hero {
+      padding: 5.5rem 0 4.5rem;
+      position: relative;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      width: 600px;
+      height: 600px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse, var(--accent-subtle) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-status {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .hero-status::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #34D399;
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+    }
+
+    .hero-name {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(2.75rem, 8vw, 5.25rem);
+      font-weight: 520;
+      font-variation-settings: 'opsz' 72, 'SOFT' 60;
+      line-height: 1.04;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      animation: fadeUp 0.6s ease 0.05s both;
+    }
+
+    .hero-title {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 0;
+      font-weight: 400;
+      animation: fadeUp 0.6s ease 0.1s both;
+    }
+
+    .hero-bar {
+      display: block;
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), rgba(96, 165, 250, 0.2));
+      margin: 2rem 0;
+      border: none;
+      animation: barGlow 3s ease-in-out infinite, fadeIn 0.6s ease 0.15s both;
+    }
+
+    .hero-bio {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      max-width: 520px;
+      margin-bottom: 1.75rem;
+      font-weight: 400;
+      animation: fadeUp 0.6s ease 0.2s both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+      animation: fadeUp 0.6s ease 0.25s both;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.65rem 1.5rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500; font-size: 0.8rem;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .btn-primary {
+      background: var(--accent); color: var(--bg);
+      box-shadow: 0 0 0 rgba(96, 165, 250, 0);
+    }
+
+    .btn-primary:hover {
+      background: #3B82F6;
+      box-shadow: 0 0 28px rgba(96, 165, 250, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      background: none; color: var(--text-muted);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Section reveal ── */
+
+    .section {
+      padding: 4.5rem 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-header {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500; font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--text-muted); flex-shrink: 0;
+    }
+
+    .section-header .rule {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--line), transparent);
+    }
+
+    .section-header .rule-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── Projects ── */
+
+    .project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+
+    .project-card {
+      background: var(--surface);
+      border-left: 3px solid var(--line);
+      padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+      display: flex; flex-direction: column;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: border-color 0.3s, background 0.3s, transform 0.3s ease, opacity 0.5s ease;
+    }
+
+    .project-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .project-card:hover {
+      border-left-color: var(--accent);
+      background: var(--surface-hover);
+      transform: translateY(-2px);
+    }
+
+    .project-card h3 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 480;
+      font-size: 1.2rem;
+      font-variation-settings: 'opsz' 36, 'SOFT' 40;
+      letter-spacing: -0.015em;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .project-card > p {
+      font-size: 0.85rem; color: var(--text-muted);
+      line-height: 1.65; margin-bottom: 1rem; flex: 1;
+    }
+
+    .tech-tags { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 1.25rem; }
+
+    .tag {
+      display: inline-block; padding: 0.2rem 0.55rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.625rem;
+      color: var(--text-muted); background: var(--bg); border: 1px solid var(--line);
+      letter-spacing: -0.01em;
+    }
+
+    .tag:hover { border-color: var(--accent); }
+
+    .project-links { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+
+    .btn-sm {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500; font-size: 0.75rem;
+      color: var(--text-muted); text-decoration: none;
+      padding-bottom: 2px;
+      border-bottom: 1px solid transparent;
+      transition: all 0.25s;
+      display: inline-flex; align-items: center; gap: 0.375rem;
+    }
+
+    .btn-sm:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── Skills ── */
+
+    .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+
+    .skill-group h3 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500; font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--text-muted); margin-bottom: 1rem;
+    }
+
+    .skill-items { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .skill-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      background: var(--surface); border: 1px solid var(--line);
+      transition: border-color 0.25s, background 0.25s, transform 0.25s;
+    }
+
+    .skill-item:hover {
+      border-color: var(--accent);
+      background: var(--surface-hover);
+      transform: translateX(3px);
+    }
+
+    .skill-item .name { font-weight: 450; font-size: 0.85rem; color: var(--text); }
+    .skill-item .level { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-muted); }
+
+    /* ── Contact ── */
+
+    .contact-card { max-width: 480px; margin: 0 auto; text-align: center; }
+    .contact-card p { font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    .contact-card .contact-cta {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 480;
+      font-size: 1.65rem;
+      font-variation-settings: 'opsz' 36, 'SOFT' 40;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      line-height: 1.3;
+    }
+
+    .btn-lg { padding: 0.8rem 2rem; font-size: 0.85rem; }
+
+    /* ── Footer ── */
+
+    footer { padding: 3rem 0; text-align: center; border-top: 1px solid var(--line); }
+    footer p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .empty {
+      color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem; grid-column: 1 / -1;
+      padding: 2.5rem 0; text-align: center;
+    }
+
+    /* ── Responsive ── */
+
+    @media (max-width: 768px) {
+      .hero { padding: 3.5rem 0 3rem; }
+      .hero::after { width: 350px; height: 350px; }
+      .section { padding: 3rem 0; }
+      .project-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      .nav .container { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+      .nav-links { gap: 1rem; }
+      .hero-name { letter-spacing: -0.015em; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav" role="navigation">
+    <div class="container">
+      <a href="#" class="nav-brand">{{ info.name|default:"Portfolio" }}</a>
+      <ul class="nav-links">
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="hero" role="banner">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-status">Available for projects</div>
+        <h1 class="hero-name">{{ info.name|default:"Your Name" }}</h1>
+        <p class="hero-title">{{ info.title|default:"Developer" }}</p>
+        <span class="hero-bar" aria-hidden="true"></span>
+        <p class="hero-bio">{{ info.bio|default:"Building things for the web." }}</p>
+        <div class="hero-actions">
+          {% if info.email %}
+            <a href="mailto:{{ info.email }}" class="btn btn-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+              Send an email
+            </a>
+          {% endif %}
+          {% if info.github_url %}
+            <a href="{{ info.github_url }}" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
+          {% endif %}
+          {% if info.linkedin_url %}
+            <a href="{{ info.linkedin_url }}" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="projects" class="section" aria-label="Projects">
+    <div class="container">
+      <header class="section-header">
+        <span class="rule-dot" aria-hidden="true"></span>
+        <h2>Projects</h2>
+        <span class="rule" aria-hidden="true"></span>
+      </header>
+      <div class="project-grid">
+        {% for project in projects %}
+          <article class="project-card" style="transition-delay: {{ forloop.counter0|add:"0.08" }}s">
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.description }}</p>
+            {% if project.tech_stack %}
+              <div class="tech-tags">
+                {% for tech in project.tech_stack|split:"," %}
+                  <span class="tag">{{ tech }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <div class="project-links">
+              {% if project.live_url %}
+                <a href="{{ project.live_url }}" target="_blank" rel="noopener" class="btn-sm">Live</a>
+              {% endif %}
+              {% if project.github_url %}
+                <a href="{{ project.github_url }}" target="_blank" rel="noopener" class="btn-sm">Source</a>
+              {% endif %}
+            </div>
+          </article>
+        {% empty %}
+          <p class="empty">No projects yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="section" aria-label="Skills">
+    <div class="container">
+      <header class="section-header">
+        <span class="rule-dot" aria-hidden="true"></span>
+        <h2>Skills</h2>
+        <span class="rule" aria-hidden="true"></span>
+      </header>
+      <div class="skills-grid">
+        <div class="skill-group">
+          <h3>Languages</h3>
+          <div class="skill-items">
+            {% for skill in languages %}
+              <div class="skill-item">
+                <span class="name">{{ skill.name }}</span>
+                {% if skill.proficiency %}
+                  <span class="level">{{ skill.proficiency }}%</span>
+                {% endif %}
+              </div>
+            {% empty %}
+              <p class="empty">None listed</p>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>Frameworks</h3>
+          <div class="skill-items">
+            {% for skill in frameworks %}
+              <div class="skill-item">
+                <span class="name">{{ skill.name }}</span>
+                {% if skill.proficiency %}
+                  <span class="level">{{ skill.proficiency }}%</span>
+                {% endif %}
+              </div>
+            {% empty %}
+              <p class="empty">None listed</p>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>Tools</h3>
+          <div class="skill-items">
+            {% for skill in tools %}
+              <div class="skill-item">
+                <span class="name">{{ skill.name }}</span>
+                {% if skill.proficiency %}
+                  <span class="level">{{ skill.proficiency }}%</span>
+                {% endif %}
+              </div>
+            {% empty %}
+              <p class="empty">None listed</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section" aria-label="Contact">
+    <div class="container">
+      <header class="section-header">
+        <span class="rule-dot" aria-hidden="true"></span>
+        <h2>Contact</h2>
+        <span class="rule" aria-hidden="true"></span>
+      </header>
+      <div class="contact-card">
+        <p class="contact-cta">Let&rsquo;s build something.</p>
+        <p>Available for projects, collaborations, and conversations.</p>
+        {% if info.email %}
+          <a href="mailto:{{ info.email }}" class="btn btn-primary btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+            Send an email
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; {% now "Y" %} {{ info.name|default:"Portfolio" }}</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08 });
+
+      var els = document.querySelectorAll('.section, .project-card');
+      for (var i = 0; i < els.length; i++) {
+        observer.observe(els[i]);
+      }
+    })();
+  </script>
+
+</body>
+</html>

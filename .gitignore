@@ -1,0 +1,39 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+/db.sqlite3
+
+# Environment
+.env
+.env.*
+venv/
+ENV/
+env/
+.venv/
+
+# IDE/editor folders
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local runtime files
+*.pid
+*.seed
+
+# Django media
+/media/
+
+# Claude workspace
+.claude/
