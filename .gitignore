@@ -32,6 +32,9 @@ Thumbs.db
 *.pid
 *.seed
 
+# Django staticfiles (build artifact)
+/staticfiles/
+
 # Django media
 /media/
 
